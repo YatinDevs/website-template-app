@@ -72,12 +72,12 @@
 
 3.  Setting Up github repository :
 
-        echo "# CRM2025" >> README.md
+        echo "# website-template-app" >> README.md
         git init
         git add README.md
         git commit -m "first commit"
         git branch -M main
-        git remote add origin https://github.com/YatinDevs/CRM2025.git
+        git remote add origin https://github.com/YatinDevs/website-template-app.git
         git push -u origin main
 
 ## Folder Structure
@@ -98,3 +98,66 @@
         │ ├── authRoutes.js
         │ └── adminRoutes.js
         ├── index.js
+
+## Setup Backend (Server) :
+
+- Tech Stack : Nodejs + Expressjs + Postgres + Docker
+
+> Setup Node App with PostgresSQL ORM
+
+1.  Create Node Project :
+
+    - Install Dependencies :
+
+            npm init or npm init -y
+            npm install
+            npm i express cors morgan body-parser
+            npm i nodemon
+            npm i dotenv
+            npm run dev or npm start
+
+    - Folder Structuring :
+
+            Add .gitignore
+            Add App folder
+            - config
+            - controller
+            - middleware
+            - models
+            - routes
+            - index.js
+
+    - create server script and run it
+
+2.  Setup Database to Node server :
+
+            npm i pg
+            npm i sequelize
+
+    - created config folder -> db.config.js -> configuration with env
+
+            # Postgres - Docker Configuration env
+            POSTGRESDB_USER=postgres
+            POSTGRESDB_ROOT_PASSWORD=12345
+            POSTGRESDB_DATABASE=lite-server_db
+            POSTGRESDB_LOCAL_PORT=5433
+            POSTGRESDB_DOCKER_PORT=5432
+
+            # Hosted db / Local db - Configuration env
+            DB_HOST=localhost
+            DB_USER=postgres
+            DB_PASSWORD=root
+            DB_NAME=webtempapp-db
+            DB_PORT=5433
+
+    - created utils folder -> db.js -> configured db with sequelize
+
+    - index.js -> dotenv config for env
+
+    - sequelize -> authentication -> synchronization with models -> port connection
+
+## Authentication
+
+- Install Dependencies :
+
+         npm install express sequelize pg pg-hstore bcryptjs jsonwebtoken cookie-parser cors dotenv nodemon
