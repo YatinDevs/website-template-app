@@ -1,7 +1,7 @@
 import api from "./api";
 import useAuthStore from "../store/authStore";
 
-export const signup = async (userData) => {
+export const signUp = async (userData) => {
   try {
     const response = await api.post("/auth/signup", userData);
     const { accessToken, userDetails } = response.data;
@@ -13,7 +13,7 @@ export const signup = async (userData) => {
   }
 };
 
-export const login = async (credentials) => {
+export const logIn = async (credentials) => {
   try {
     const response = await api.post("/auth/login", credentials);
     const { accessToken, userDetails } = response.data;
@@ -35,7 +35,7 @@ export const refreshToken = async () => {
   }
 };
 
-export const logout = async () => {
+export const logOut = async () => {
   try {
     await api.post("/auth/logout");
     useAuthStore.getState().logout();

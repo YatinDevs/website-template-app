@@ -1,17 +1,39 @@
-// store/authStore.js
 import { create } from "zustand";
-import axios from "axios";
 
-const useAuthStore = create((set, get) => ({
+import {
+  logIn as apiLogIn,
+  signUp as apiSignUp,
+  logOut as apiLogOut,
+  refreshTokenAction as apiRefreshTokenAction,
+} from "../services/authService";
+
+const useAuthStore = create((set) => ({
   user: null,
   accessToken: null,
   refreshToken: null,
   isAuthenticated: false,
 
-  // Login action
-  login: async (email, password) => {
+  signUp: async (userData) => {
     try {
-      const response = await axios.post("/api/auth/login", { email, password });
+      const response = await apiSignUp(userData);
+      console.log(response);
+      set({
+        user: response.data.userDetails,
+        accessToken: response.data.accessToken,
+        refreshToken: response.data.refreshToken,
+        isAuthenticated: true,
+      });
+
+      localStorage.setItem("accessToken", response.data.accessToken);
+    } catch (error) {
+      console.error("Signup failed:", error);
+      throw error;
+    }
+  },
+
+  logIn: async (userData) => {
+    try {
+      const response = await apiLogIn(userData);
       set({
         user: response.data.userDetails,
         accessToken: response.data.accessToken,
@@ -24,53 +46,30 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
-  // Signup action
-  signup: async (username, email, password) => {
+  logOut: async () => {
     try {
-      const response = await axios.post("/api/auth/signup", {
-        username,
-        email,
-        password,
-      });
-      set({
-        user: response.data.userDetails,
-        accessToken: response.data.accessToken,
-        refreshToken: response.data.refreshToken,
-        isAuthenticated: true,
-      });
-    } catch (error) {
-      console.error("Signup failed:", error);
-      throw error;
-    }
-  },
-
-  // Logout action
-  logout: async () => {
-    try {
-      await axios.post("/api/auth/logout");
+      const response = await apiLogOut(userData);
       set({
         user: null,
         accessToken: null,
         refreshToken: null,
         isAuthenticated: false,
       });
+      localStorage.removeItem("accessToken");
     } catch (error) {
       console.error("Logout failed:", error);
       throw error;
     }
   },
-
-  // Refresh token action
-  refreshToken: async () => {
+  refreshTokenAction: async () => {
     try {
       const { refreshToken } = get();
       if (!refreshToken) throw new Error("No refresh token available");
 
-      const response = await axios.post("/api/auth/refresh-token", {
-        refreshToken,
-      });
+      const response = await apiRefreshTokenAction(refreshToken);
       set({ accessToken: response.data.accessToken });
-      return response.data.accessToken; // Return the new access token
+      localStorage.setItem("accessToken", response.data.accessToken);
+      return response.data.accessToken;
     } catch (error) {
       console.error("Token refresh failed:", error);
       set({
@@ -78,10 +77,33 @@ const useAuthStore = create((set, get) => ({
         accessToken: null,
         refreshToken: null,
         isAuthenticated: false,
-      }); // Clear state on failure
+      });
+      localStorage.removeItem("accessToken");
       throw error;
     }
   },
 }));
 
 export default useAuthStore;
+
+// initialize: async () => {
+//   const token = localStorage.getItem("authToken");
+//   if (token) {
+//     try {
+//       const isValid = await apiValidateToken(token);
+//       if (isValid) {
+//         const user = JSON.parse(localStorage.getItem("userDetails"));
+//         set({ user, isAuthenticated: true });
+//       } else {
+//         localStorage.removeItem("authToken");
+//         localStorage.removeItem("userDetails");
+//       }
+//     } catch (error) {
+//       console.error("Error validating token:", error);
+//       localStorage.removeItem("authToken");
+//       localStorage.removeItem("userDetails");
+//     }
+//   } else {
+//     set({ user: null, isAuthenticated: false });
+//   }
+// },

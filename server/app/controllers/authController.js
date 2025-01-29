@@ -10,7 +10,7 @@ const {
 exports.signup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
-
+    console.log(username, email, password);
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ error: "Email already exists" });
@@ -31,16 +31,18 @@ exports.signup = async (req, res) => {
       token: refreshToken,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     });
-
+    console.log(refreshToken);
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
+    console.log(accessToken);
 
     res.status(201).json({
       message: "User created and logged in successfully",
-      accessToken,
+      accessToken: accessToken,
       userDetails: user,
     });
   } catch (error) {
@@ -113,7 +115,7 @@ exports.logout = async (req, res) => {
   }
 };
 
-exports.refreshToken = async (req, res) => {
+exports.refreshTokenAction = async (req, res) => {
   try {
     const { refreshToken } = req.cookies;
 

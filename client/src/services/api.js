@@ -1,58 +1,52 @@
 import axios from "axios";
-import { BASE_URL } from "../config/config";
 import useAuthStore from "../store/authStore";
-import { refreshToken } from "./auth";
+const API_BASE_URL = "http://localhost:8088/";
+// const API_BASE_URL = ":8088/";
 
-const api = axios.create({
-  baseURL: BASE_URL,
-  withCredentials: true, // Ensures cookies (refreshToken) are sent
+const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  timeout: 10000,
 });
 
-let isRefreshing = false;
-let subscribers = [];
-
-const onRefreshed = (newToken) => {
-  subscribers.forEach((callback) => callback(newToken));
-  subscribers = [];
-};
-
-api.interceptors.request.use(
-  async (config) => {
-    const { refreshTokenAction, accessToken, isAuthenticated } = useAuthStore(
-      (state) => ({
-        accessToken: state.accessToken,
-        isAuthenticated: state.isAuthenticated,
-        refreshTokenAction: state.refreshTokenAction,
-      })
-    );
-
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-      return config;
+      config.headers["Authorization"] = `Bearer ${accessToken}`;
     }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-    if (!isRefreshing) {
-      isRefreshing = true;
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
       try {
-        const newAccessToken = await refreshTokenAction();
-        useAuthStore.getState().setAccessToken(newAccessToken);
-        onRefreshed(newAccessToken);
-      } catch (error) {
-        console.error("Token refresh failed", error);
-        useAuthStore.getState().logout(); // Log out user on failure
-      } finally {
-        isRefreshing = false;
+        const newAccessToken = await useAuthStore
+          .getState()
+          .refreshTokenAction();
+        originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
+        console.error("Failed to refresh token:", refreshError);
+        useAuthStore.getState().logOut();
+        return Promise.reject(refreshError);
       }
     }
 
-    return new Promise((resolve) => {
-      subscribers.push((newToken) => {
-        config.headers.Authorization = `Bearer ${newToken}`;
-        resolve(config);
-      });
-    });
-  },
-  (error) => Promise.reject(error)
+    return Promise.reject(error);
+  }
 );
 
-export default api;
+export default axiosInstance;
