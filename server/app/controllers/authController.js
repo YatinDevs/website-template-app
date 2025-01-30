@@ -1,12 +1,13 @@
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Token = require("../models/tokenModel");
 const User = require("../models/userModel");
+const bcrypt = require("bcrypt");
 const {
   generateAccessToken,
   generateRefreshToken,
 } = require("../utils/tokenUtils");
 
+// User Signup flow
 exports.signup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -16,7 +17,8 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ error: "Email already exists" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10); // Secure password storage
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await User.create({
       username,
       email,
@@ -50,20 +52,33 @@ exports.signup = async (req, res) => {
   }
 };
 
+// User Login flow
 exports.login = async (req, res) => {
   try {
+    console.log(req.body);
+
     const { email, password } = req.body;
 
     const user = await User.findOne({ where: { email } });
+    console.log(user);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ error: "Invalid password" });
-    }
+    console.log(password);
+    console.log(user.password);
 
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      user?.dataValues?.password
+    );
+    console.log(isPasswordValid);
+
+    if (!isPasswordValid) {
+      return res
+        .status(401)
+        .json({ success: false, error: "Invalid password." });
+    }
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
@@ -77,6 +92,7 @@ exports.login = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.json({

@@ -21,20 +21,24 @@ const User = sequelize.define(
       unique: true,
     },
     password: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(255),
       allowNull: false,
     },
     role: {
-      type: DataTypes.ENUM("user", "admin"),
+      type: DataTypes.ENUM(
+        "user",
+        "admin",
+        "hr",
+        "accounts",
+        "sales",
+        "support"
+      ),
       defaultValue: "user",
     },
   },
   {
-    hooks: {
-      beforeCreate: async (user) => {
-        user.password = await bcrypt.hash(user.password, 10);
-      },
-    },
+    tableName: "users",
+    timestamps: true,
   }
 );
 

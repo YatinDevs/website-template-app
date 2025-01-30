@@ -160,27 +160,36 @@
 
 - Install Dependencies :
 
-             npm install express sequelize pg pg-hstore bcryptjs jsonwebtoken cookie-parser cors dotenv nodemon
+               npm install express sequelize pg pg-hstore bcryptjs jsonwebtoken cookie-parser cors dotenv nodemon
 
-    <!--
-  
-    {
-      "username" : "yatin",
-      "email" : "c.yatin727@gmail.com",
-      "password" : "9594515799"
-    }
-    {
-        "message": "User created and logged in successfully",
-        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InVzZXIiLCJpYXQiOjE3MzgxMjcxNDksImV4cCI6MTczODEyODA0OX0.l2V7d0cQmKDDpjO2PIMTrq6cynpA6pmE-h7lh_lMBOo",
-        "userDetails": {
-            "role": "user",
-            "id": 1,
-            "username": "yatin",
-            "email": "c.yatin727@gmail.com",
-            "password": "$2a$10$tFV.j3VMsRpn/shk4KMww.VUwYpeAKXIeDNisoMkRR4rnBSFtACce",
-            "updatedAt": "2025-01-29T05:05:49.611Z",
-            "createdAt": "2025-01-29T05:05:49.611Z"
-        }
-     } 
-    
-    -->
+      <!--
+
+      {
+        "username" : "yatin",
+        "email" : "c.yatin727@gmail.com",
+        "password" : "9594515799"
+      }
+      {
+          "message": "User created and logged in successfully",
+          "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InVzZXIiLCJpYXQiOjE3MzgxMjcxNDksImV4cCI6MTczODEyODA0OX0.l2V7d0cQmKDDpjO2PIMTrq6cynpA6pmE-h7lh_lMBOo",
+          "userDetails": {
+              "role": "user",
+              "id": 1,
+              "username": "yatin",
+              "email": "c.yatin727@gmail.com",
+              "password": "$2a$10$tFV.j3VMsRpn/shk4KMww.VUwYpeAKXIeDNisoMkRR4rnBSFtACce",
+              "updatedAt": "2025-01-29T05:05:49.611Z",
+              "createdAt": "2025-01-29T05:05:49.611Z"
+          }
+       }
+
+      -->
+
+# Admin Credentials
+
+                {
+                "username" : "Yatin Chaudhari",
+                "email" : "c.yatin727@gmail.com",
+                "password" : "9594515799"
+
+                }
